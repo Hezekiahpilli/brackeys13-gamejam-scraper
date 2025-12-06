@@ -90,12 +90,15 @@ class BrackeysWorkflow:
 ╚══════════════════════════════════════════════════════════════════════╝
 
 This workflow will:
-  1. Scrape Page 1 (pilot - 8 expected entries)
+  1. Scrape Page 1 (pilot - flexible 3D detection)
   2. Scrape Page 2 (pilot - append to master)
   3. Scrape Page 3 (pilot - append to master)
   4. Scrape all remaining pages (pages 4-36 - can take 6+ hours)
   5. Augment missing contacts
   6. Create Google Sheet
+
+3D Detection: Tags (3D, Unity, Unreal, Godot), Perspectives (FPS,
+              First-Person), Styles (Low Poly, Voxel), Title/Description
 
 Starting at: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}
 
