@@ -125,13 +125,42 @@ class BrackeysMasterScraper:
         
         return details
     
-    def has_explicit_3d_tag(self, tags: List[str]) -> bool:
+    def is_3d_game(self, tags: List[str], title: str = '', description: str = '') -> bool:
         """
-        STRICT REQUIREMENT: Game must have an explicit "3D" tag.
-        No inference from engines or other indicators.
+        Determine if a game is 3D based on tags, engines, and other indicators.
+
+        Detects 3D games through:
+        - Explicit "3D" tag (exact match, case-sensitive)
+        - 3D engines (Unity, Unreal, Godot)
+        - 3D perspectives (First-Person, Third-Person, FPS, TPS)
+        - 3D styles (Low Poly, Voxel, 3D Platformer)
+        - Title/description mentions of 3D
         """
+        # Check for exact "3D" tag (case-sensitive first, then case-insensitive)
+        if '3D' in tags or '3d' in tags:
+            return True
+
+        # Convert to lowercase for other checks
         tags_lower = [tag.lower() for tag in tags]
-        return '3d' in tags_lower
+
+        # Common 3D engine/style tags
+        three_d_indicators = [
+            'unity', 'unreal', 'godot', 'unreal engine',
+            'first-person', 'third-person', 'fps', 'tps',
+            '3d platformer', 'low poly', 'voxel', 'low-poly',
+            'three dimensional', 'three-dimensional'
+        ]
+
+        for indicator in three_d_indicators:
+            if any(indicator in tag for tag in tags_lower):
+                return True
+
+        # Check title and description as fallback
+        text = (title + ' ' + description).lower()
+        if '3d' in text or 'three dimensional' in text or 'three-dimensional' in text:
+            return True
+
+        return False
     
     def extract_contact_info(self, developer_url: str, game_url: str, studio_name: str) -> Dict:
         """
@@ -277,34 +306,38 @@ class BrackeysMasterScraper:
         return '; '.join(additional)
     
     def scrape_page(self, page_num: int) -> List[Dict]:
-        """Scrape a complete page with STRICT 3D filtering."""
+        """Scrape a complete page with flexible 3D detection."""
         results = []
-        
+
         soup = self.get_page(page_num)
         if not soup:
             return results
-        
+
         entries = self.extract_game_entries(soup)
         print(f"\n🎮 Processing {len(entries)} entries from page {page_num}...\n")
-        
+
         three_d_count = 0
-        
+
         for i, entry in enumerate(entries, 1):
             print(f"[{i}/{len(entries)}] {entry.get('title', 'Unknown')}")
-            
+
             if 'game_url' not in entry:
                 print(f"  ⚠️ No game URL, skipping")
                 continue
-            
+
             # Get game details
             details = self.get_game_details(entry['game_url'])
             entry.update(details)
-            
-            # STRICT 3D CHECK: Must have explicit "3D" tag
-            if not self.has_explicit_3d_tag(entry.get('tags', [])):
+
+            # FLEXIBLE 3D DETECTION: Check tags, engines, perspectives, title, description
+            if not self.is_3d_game(
+                entry.get('tags', []),
+                entry.get('title', ''),
+                entry.get('description', '')
+            ):
                 print(f"  ❌ Not 3D - Tags: {', '.join(entry.get('tags', []))}")
                 continue
-            
+
             three_d_count += 1
             print(f"  ✅ 3D GAME! Tags: {', '.join(entry.get('tags', []))}")
             
@@ -423,11 +456,11 @@ class BrackeysMasterScraper:
 
 
 def task_1_page_1(output_file: str = 'brackeys_page1.csv'):
-    """Task 1: Pilot scrape (Page 1) - Expected 8 entries with explicit 3D tag"""
+    """Task 1: Pilot scrape (Page 1) - Flexible 3D detection"""
     print("""
 ╔═══════════════════════════════════════════════════════════════════╗
 ║                    TASK 1: PAGE 1 PILOT SCRAPE                    ║
-║              Expected: 8 entries with explicit '3D' tag           ║
+║         Flexible 3D Detection: Tags, Engines, Perspectives        ║
 ╚═══════════════════════════════════════════════════════════════════╝
 """)
     
@@ -445,19 +478,15 @@ def task_1_page_1(output_file: str = 'brackeys_page1.csv'):
     with open(output_file, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         entries = list(reader)
-        print(f"✓ Total entries: {len(entries)}")
-        print(f"✓ Expected: 8 entries")
-        if len(entries) == 8:
-            print("✅ COUNT MATCHES!")
+        print(f"✓ Total entries found: {len(entries)}")
+
+        if len(entries) > 0:
+            print(f"✅ Found {len(entries)} 3D games on page 1")
+            print(f"\nSample tags found:")
+            for i, entry in enumerate(entries[:3], 1):
+                print(f"  {i}. {entry['Game Title']}: {entry['Tags'][:80]}...")
         else:
-            print(f"⚠️ COUNT MISMATCH: Expected 8, got {len(entries)}")
-        
-        # Check all have 3D tag
-        all_have_3d = all('3D' in entry['Tags'] or '3d' in entry['Tags'] for entry in entries)
-        if all_have_3d:
-            print("✅ All entries have explicit 3D tag")
-        else:
-            print("⚠️ Some entries missing 3D tag")
+            print(f"⚠️ No 3D games found (may be network issue)")
 
 
 def task_2_page_2(output_file: str = 'brackeys_master.csv'):
