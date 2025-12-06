@@ -22,6 +22,7 @@ from urllib.parse import urljoin
 from typing import Dict, List, Set, Optional, Tuple
 import sys
 from collections import defaultdict
+import os
 
 class BrackeysMasterScraper:
     def __init__(self, base_url: str = "https://itch.io/jam/brackeys-13/entries"):
@@ -430,6 +431,9 @@ def task_1_page_1(output_file: str = 'brackeys_page1.csv'):
     print(f"\n{'='*70}")
     print("VERIFICATION:")
     print(f"{'='*70}")
+    if not os.path.exists(output_file):
+        print(f"❌ Output file '{output_file}' was not created (no 3D entries found or network issue).")
+        return
     with open(output_file, 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         entries = list(reader)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Complete Workflow for Brackeys-13 3D Games Scraping
 Runs all 6 tasks in sequence with progress tracking.
@@ -73,7 +73,7 @@ Starting at: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}
         
         # Task 1: Page 1 Pilot
         success = self.run_command(
-            ['python3', 'brackeys_master_scraper.py', '--task', '1', '--output', 'brackeys_page1.csv'],
+            ['python', 'brackeys_master_scraper.py', '--task', '1', '--output', 'brackeys_page1.csv'],
             'Task 1: Page 1 Pilot Scrape'
         )
         if not success:
@@ -85,7 +85,7 @@ Starting at: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}
         
         # Task 2: Page 2 Pilot
         success = self.run_command(
-            ['python3', 'brackeys_master_scraper.py', '--task', '2', '--output', 'brackeys_master.csv'],
+            ['python', 'brackeys_master_scraper.py', '--task', '2', '--output', 'brackeys_master.csv'],
             'Task 2: Page 2 Pilot Scrape'
         )
         if not success:
@@ -97,7 +97,7 @@ Starting at: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}
         
         # Task 3: Page 3 Pilot
         success = self.run_command(
-            ['python3', 'brackeys_master_scraper.py', '--task', '3', '--output', 'brackeys_master.csv'],
+            ['python', 'brackeys_master_scraper.py', '--task', '3', '--output', 'brackeys_master.csv'],
             'Task 3: Page 3 Pilot Scrape'
         )
         if not success:
@@ -118,12 +118,12 @@ Starting at: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}
             
             if input().lower() == 'y':
                 success = self.run_command(
-                    ['python3', 'brackeys_master_scraper.py', '--task', '4', '--output', 'brackeys_master.csv'],
+                    ['python', 'brackeys_master_scraper.py', '--task', '4', '--output', 'brackeys_master.csv'],
                     'Task 4: Full Scrape (Pages 4-36)'
                 )
             else:
                 print("\n⏭️ Skipping full scrape. Run manually later with:")
-                print("   python3 brackeys_master_scraper.py --task 4")
+                print("   python brackeys_master_scraper.py --task 4")
                 self.results['Task 4: Full Scrape'] = {
                     'status': 'SKIPPED',
                     'timestamp': datetime.now().isoformat()
@@ -140,7 +140,7 @@ Starting at: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}
         # Task 5: Contact Augmentation
         csv_file = 'brackeys_master.csv' if os.path.exists('brackeys_master.csv') else 'brackeys_page1.csv'
         success = self.run_command(
-            ['python3', 'contact_augmentation.py', csv_file],
+            ['python', 'contact_augmentation.py', csv_file],
             'Task 5: Contact Augmentation'
         )
         
@@ -157,13 +157,13 @@ Starting at: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}
         
         if input().lower() == 'y':
             success = self.run_command(
-                ['python3', 'google_sheet_creator.py', final_file],
+                ['python', 'google_sheet_creator.py', final_file],
                 'Task 6: Google Sheet Creation'
             )
         else:
             print("\n📄 Creating formatted CSV instead...")
             success = self.run_command(
-                ['python3', 'google_sheet_creator.py', final_file, '--csv-only'],
+                ['python', 'google_sheet_creator.py', final_file, '--csv-only'],
                 'Task 6: Formatted CSV Export'
             )
         
@@ -183,21 +183,21 @@ Starting at: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}
         
         # Task 1
         self.run_command(
-            ['python3', 'brackeys_master_scraper.py', '--task', '1', '--output', 'brackeys_page1.csv'],
+            ['python', 'brackeys_master_scraper.py', '--task', '1', '--output', 'brackeys_page1.csv'],
             'Task 1: Page 1 Pilot Scrape'
         )
         time.sleep(2)
         
         # Task 2
         self.run_command(
-            ['python3', 'brackeys_master_scraper.py', '--task', '2', '--output', 'brackeys_master.csv'],
+            ['python', 'brackeys_master_scraper.py', '--task', '2', '--output', 'brackeys_master.csv'],
             'Task 2: Page 2 Pilot Scrape'
         )
         time.sleep(2)
         
         # Task 3
         self.run_command(
-            ['python3', 'brackeys_master_scraper.py', '--task', '3', '--output', 'brackeys_master.csv'],
+            ['python', 'brackeys_master_scraper.py', '--task', '3', '--output', 'brackeys_master.csv'],
             'Task 3: Page 3 Pilot Scrape'
         )
         
