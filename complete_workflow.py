@@ -136,19 +136,23 @@ Note: If network access is unavailable, empty CSVs will be created
         # Check if we have any data, if not use sample data
         self.ensure_data_exists()
         
-        # Task 4: Full Scrape (optional, auto-skip in demo mode)
-        if not skip_full_scrape and not auto_continue:
+        # Task 4: Full Scrape (optional)
+        if not skip_full_scrape:
             print("\n" + "="*70)
             print("TASK 4: FULL SCRAPE")
             print("="*70)
             print("\n⚠️ Warning: This will scrape pages 4-36 and may take 6+ hours.")
-            print("   Skipping in auto mode. Run manually later if needed.")
-            self.results['Task 4: Full Scrape'] = {
-                'status': 'SKIPPED',
-                'timestamp': datetime.now().isoformat()
-            }
+            print("   Starting full scrape...\n")
+
+            success = self.run_command(
+                ['python', 'brackeys_master_scraper.py', '--task', '4', '--output', 'brackeys_master.csv'],
+                'Task 4: Full Scrape (Pages 4-36)'
+            )
+            if not success and not auto_continue:
+                print("\n⚠️ Task 4 had issues. Continuing with remaining tasks...")
         else:
-            print("\n⏭️ Full scrape skipped (will run separately if needed)")
+            print("\n⏭️ Full scrape skipped (--skip-full-scrape flag used)")
+            print("   To run Task 4, remove the --skip-full-scrape flag")
             self.results['Task 4: Full Scrape'] = {
                 'status': 'SKIPPED',
                 'timestamp': datetime.now().isoformat()
