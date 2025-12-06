@@ -130,17 +130,18 @@ class BrackeysMasterScraper:
         Determine if a game is 3D based on tags, engines, and other indicators.
 
         Detects 3D games through:
-        - Explicit "3D" tag
+        - Explicit "3D" tag (exact match, case-sensitive)
         - 3D engines (Unity, Unreal, Godot)
         - 3D perspectives (First-Person, Third-Person, FPS, TPS)
         - 3D styles (Low Poly, Voxel, 3D Platformer)
         - Title/description mentions of 3D
         """
-        tags_lower = [tag.lower() for tag in tags]
-
-        # Explicit 3D tag
-        if '3d' in tags_lower:
+        # Check for exact "3D" tag (case-sensitive first, then case-insensitive)
+        if '3D' in tags or '3d' in tags:
             return True
+
+        # Convert to lowercase for other checks
+        tags_lower = [tag.lower() for tag in tags]
 
         # Common 3D engine/style tags
         three_d_indicators = [
