@@ -366,11 +366,9 @@ class BrackeysMasterScraper:
         """
         Save results to CSV with exact format:
         Studio Name, Game Title, Itch URL, Tags, Primary Contact, Additional Contacts, Source URLs
+
+        Creates empty CSV with headers if no data, allowing workflow to continue.
         """
-        if not self.processed_studios:
-            print("⚠️ No data to save.")
-            return
-        
         fieldnames = [
             'Studio Name',
             'Game Title',
@@ -380,14 +378,24 @@ class BrackeysMasterScraper:
             'Additional Contacts',
             'Source URLs'
         ]
-        
+
+        if not self.processed_studios:
+            print("⚠️ No data to save. Creating empty CSV with headers.")
+            # Create empty CSV with headers so workflow can continue
+            if mode == 'w' or not os.path.exists(output_file):
+                with open(output_file, 'w', newline='', encoding='utf-8') as f:
+                    writer = csv.DictWriter(f, fieldnames=fieldnames)
+                    writer.writeheader()
+                print(f"✅ Created empty CSV: {output_file}")
+            return
+
         rows = []
         for studio_name, data in self.processed_studios.items():
             # Get contacts
             primary = self.get_primary_contact(data['contacts'])
             additional = self.get_additional_contacts(data['contacts'], primary)
             source_urls = '; '.join(data['source_urls'])
-            
+
             # Create row for each game by this studio
             for game in data['games']:
                 row = {
@@ -400,15 +408,15 @@ class BrackeysMasterScraper:
                     'Source URLs': source_urls
                 }
                 rows.append(row)
-        
+
         with open(output_file, mode, newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
-            
+
             if mode == 'w':
                 writer.writeheader()
-            
+
             writer.writerows(rows)
-        
+
         print(f"\n✅ Saved {len(rows)} entries to {output_file}")
         print(f"   • Unique studios: {len(self.processed_studios)}")
         print(f"   • Total games: {len(rows)}")

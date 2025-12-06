@@ -11,17 +11,8 @@ import csv
 from collections import defaultdict
 from typing import List, Dict
 
-# Optional: Google Sheets API integration
-try:
-    from google.oauth2.credentials import Credentials
-    from google.oauth2 import service_account
-    from googleapiclient.discovery import build
-    from googleapiclient.errors import HttpError
-    GOOGLE_AVAILABLE = True
-except ImportError:
-    GOOGLE_AVAILABLE = False
-    print("⚠️ Google API libraries not installed.")
-    print("   Run: pip install google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client")
+# Google Sheets API will be imported only when needed
+GOOGLE_AVAILABLE = None  # Will be checked lazily
 
 
 class GoogleSheetCreator:
@@ -44,6 +35,22 @@ class GoogleSheetCreator:
     
     def authenticate(self):
         """Authenticate with Google Sheets API."""
+        global GOOGLE_AVAILABLE
+
+        # Lazy import of Google libraries
+        if GOOGLE_AVAILABLE is None:
+            try:
+                from google.oauth2.credentials import Credentials
+                from google.oauth2 import service_account
+                from googleapiclient.discovery import build
+                from googleapiclient.errors import HttpError
+                GOOGLE_AVAILABLE = True
+            except ImportError as e:
+                GOOGLE_AVAILABLE = False
+                print(f"⚠️ Google API libraries not installed: {e}")
+                print("   Run: pip install google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client")
+                return False
+
         if not GOOGLE_AVAILABLE:
             print("❌ Google API libraries not available")
             return False

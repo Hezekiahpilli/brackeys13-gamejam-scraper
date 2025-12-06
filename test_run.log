@@ -1,0 +1,17 @@
+
+╔═══════════════════════════════════════════════════════════════════╗
+║                    TASK 1: PAGE 1 PILOT SCRAPE                    ║
+║              Expected: 8 entries with explicit '3D' tag           ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+
+======================================================================
+Fetching page 1: https://itch.io/jam/brackeys-13/entries
+======================================================================
+❌ Error fetching page 1: HTTPSConnectionPool(host='itch.io', port=443): Max retries exceeded with url: /jam/brackeys-13/entries (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))
+⚠️ No data to save.
+
+======================================================================
+VERIFICATION:
+======================================================================
+❌ Output file 'test_output.csv' was not created (no 3D entries found or network issue).
