@@ -79,7 +79,7 @@ class BrackeysWorkflow:
             print(f"\n❌ Unexpected error in {description}: {e}")
             return False
     
-    def run_full_workflow(self, skip_full_scrape: bool = False, auto_continue: bool = False):
+    def run_full_workflow(self, auto_continue: bool = False):
         """Run all 6 tasks in sequence."""
         self.start_time = datetime.now()
 
@@ -93,7 +93,7 @@ This workflow will:
   1. Scrape Page 1 (pilot - 8 expected entries)
   2. Scrape Page 2 (pilot - append to master)
   3. Scrape Page 3 (pilot - append to master)
-  4. Scrape all remaining pages (optional - can take 6+ hours)
+  4. Scrape all remaining pages (pages 4-36 - can take 6+ hours)
   5. Augment missing contacts
   6. Create Google Sheet
 
@@ -135,28 +135,20 @@ Note: If network access is unavailable, empty CSVs will be created
 
         # Check if we have any data, if not use sample data
         self.ensure_data_exists()
-        
-        # Task 4: Full Scrape (optional)
-        if not skip_full_scrape:
-            print("\n" + "="*70)
-            print("TASK 4: FULL SCRAPE")
-            print("="*70)
-            print("\n⚠️ Warning: This will scrape pages 4-36 and may take 6+ hours.")
-            print("   Starting full scrape...\n")
 
-            success = self.run_command(
-                ['python', 'brackeys_master_scraper.py', '--task', '4', '--output', 'brackeys_master.csv'],
-                'Task 4: Full Scrape (Pages 4-36)'
-            )
-            if not success and not auto_continue:
-                print("\n⚠️ Task 4 had issues. Continuing with remaining tasks...")
-        else:
-            print("\n⏭️ Full scrape skipped (--skip-full-scrape flag used)")
-            print("   To run Task 4, remove the --skip-full-scrape flag")
-            self.results['Task 4: Full Scrape'] = {
-                'status': 'SKIPPED',
-                'timestamp': datetime.now().isoformat()
-            }
+        # Task 4: Full Scrape (Pages 4-36)
+        print("\n" + "="*70)
+        print("TASK 4: FULL SCRAPE")
+        print("="*70)
+        print("\n⚠️ Warning: This will scrape pages 4-36 and may take 6+ hours.")
+        print("   Starting full scrape...\n")
+
+        success = self.run_command(
+            ['python', 'brackeys_master_scraper.py', '--task', '4', '--output', 'brackeys_master.csv'],
+            'Task 4: Full Scrape (Pages 4-36)'
+        )
+        if not success and not auto_continue:
+            print("\n⚠️ Task 4 had issues. Continuing with remaining tasks...")
 
         time.sleep(1)
         
@@ -296,9 +288,7 @@ def main():
         description='Complete workflow for Brackeys-13 scraping (all 6 tasks)'
     )
     parser.add_argument('--pilot-only', action='store_true',
-                        help='Run only pilot tasks (1-3)')
-    parser.add_argument('--skip-full-scrape', action='store_true',
-                        help='Skip task 4 (full scrape)')
+                        help='Run only pilot tasks (1-3), skip full scrape')
     parser.add_argument('--auto-continue', action='store_true',
                         help='Auto-continue through all tasks without prompts (demo mode)')
 
@@ -309,10 +299,7 @@ def main():
     if args.pilot_only:
         workflow.run_pilot_only()
     else:
-        workflow.run_full_workflow(
-            skip_full_scrape=args.skip_full_scrape,
-            auto_continue=args.auto_continue
-        )
+        workflow.run_full_workflow(auto_continue=args.auto_continue)
 
 
 if __name__ == "__main__":
